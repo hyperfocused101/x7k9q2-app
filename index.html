@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="VoiceNotes" />
+  <title>YouTube Voice Notes</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icon.svg" />
+  <style>
+    /* Critical CSS — prevents flash of unstyled content before Vite injects styles */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: #0a0a0a; color: #f0f0f0; font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; height: 100%; }
+    .hidden { display: none !important; }
+    #history-overlay { display: none; }
+    #history-drawer { display: none; }
+  </style>
+  <script type="module" crossorigin src="/x7k9q2-app/assets/index-Of-DxaTW.js"></script>
+  <link rel="stylesheet" crossorigin href="/x7k9q2-app/assets/index-ggp8TwSH.css">
+</head>
+<body>
+
+  <div id="app">
+
+    <!-- Header -->
+    <header id="app-header">
+      <div class="header-inner">
+        <span class="app-logo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"/>
+          </svg>
+          VoiceNotes
+        </span>
+        <div class="header-actions">
+          <button id="new-session-btn" class="icon-btn" title="New session" aria-label="Start new session">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+          </button>
+          <button id="history-btn" class="icon-btn" title="History" aria-label="View recording history">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+              <path d="M3 3v5h5"/>
+              <path d="M12 7v5l4 2"/>
+            </svg>
+            <span id="history-badge" class="badge hidden">0</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Player section -->
+    <section id="player-section">
+      <div id="player-wrapper">
+        <div id="yt-player-container">
+          <div id="yt-player"></div>
+          <div id="player-placeholder">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+              <rect x="2" y="7" width="20" height="15" rx="2"/>
+              <polyline points="17 2 12 7 7 2"/>
+            </svg>
+            <p>Paste a YouTube link below to get started</p>
+          </div>
+        </div>
+        <div id="video-title-bar" class="hidden">
+          <span id="video-title-text"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- URL input -->
+    <section id="url-section">
+      <div class="url-input-row">
+        <input
+          type="url"
+          id="url-input"
+          placeholder="Paste YouTube URL..."
+          autocomplete="off"
+          autocorrect="off"
+          spellcheck="false"
+        />
+        <button id="load-btn" class="btn btn-primary">Load</button>
+      </div>
+    </section>
+
+    <!-- Session status bar -->
+    <div id="session-bar" class="hidden">
+      <div class="session-bar-left">
+        <div id="recording-indicator" class="hidden">
+          <span class="rec-dot"></span>
+          <span class="rec-label">REC</span>
+        </div>
+        <div id="session-idle-hint">Session active — press Record to begin capturing</div>
+      </div>
+      <span id="rec-timer" class="session-timer">0:00</span>
+    </div>
+
+    <!-- Controls -->
+    <section id="controls-section">
+      <div class="controls-row">
+        <button id="record-btn" class="btn btn-record" disabled>
+          <span class="btn-icon">
+            <svg id="mic-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+              <line x1="12" y1="19" x2="12" y2="23"/>
+              <line x1="8" y1="23" x2="16" y2="23"/>
+            </svg>
+          </span>
+          <span id="record-btn-label">Record</span>
+        </button>
+
+        <button id="stop-session-btn" class="btn btn-stop" disabled>
+          <span class="btn-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+            </svg>
+          </span>
+          <span>Stop &amp; Save</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Recovery banner -->
+    <div id="recovery-banner" class="hidden">
+      <div class="recovery-content">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span id="recovery-text">Previous session found.</span>
+        <button id="recovery-restore-btn" class="btn-link">Restore</button>
+        <button id="recovery-dismiss-btn" class="btn-link muted">Dismiss</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- History drawer overlay -->
+  <div id="history-overlay" class="hidden"></div>
+
+  <!-- History drawer -->
+  <aside id="history-drawer" class="hidden">
+    <div id="history-header">
+      <h2>Recordings</h2>
+      <button id="close-history-btn" class="icon-btn" aria-label="Close history">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div id="history-list">
+      <div id="history-empty" class="empty-state">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="23"/>
+        </svg>
+        <p>No recordings yet</p>
+        <small>Load a YouTube video and start recording</small>
+      </div>
+    </div>
+  </aside>
+
+  <!-- New session confirmation modal -->
+  <div id="new-session-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal">
+      <h3 id="modal-title">Active Session</h3>
+      <p>You have an active recording session. What would you like to do?</p>
+      <div class="modal-actions">
+        <button id="modal-save-btn" class="btn modal-btn modal-btn-save">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Save &amp; Start New
+        </button>
+        <button id="modal-discard-btn" class="btn modal-btn modal-btn-discard">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+          Discard &amp; Start New
+        </button>
+        <button id="modal-cancel-btn" class="btn modal-btn modal-btn-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div id="toast" role="status" aria-live="polite"></div>
+
+</body>
+</html>
